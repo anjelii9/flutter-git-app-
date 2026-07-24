@@ -10,68 +10,30 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Palet warna "high class": navy tua + gold accent + off-white background
-    const navy = Color(0xFF10192E);
-    const gold = Color(0xFFC9A24B);
-    const background = Color(0xFFF6F4EF);
+    // Palet "dark brown x baby pink" — classic & elegant
+    const darkBrown = Color(0xFF3E2723);
+    const cream = Color(0xFFFBF3EE);
 
     return MaterialApp(
-      title: 'Navigation App',
+      title: 'Photobooth Login',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
-        scaffoldBackgroundColor: background,
+        scaffoldBackgroundColor: cream,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: navy,
-          primary: navy,
-          secondary: gold,
-          surface: background,
+          seedColor: darkBrown,
+          primary: darkBrown,
+          secondary: const Color(0xFFF6C6C9),
+          surface: cream,
         ),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: navy,
-          foregroundColor: Colors.white,
-          elevation: 0,
-          centerTitle: true,
-          titleTextStyle: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.5,
-          ),
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: navy,
-            foregroundColor: gold,
-            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
-            ),
-            elevation: 4,
-            textStyle: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.6,
-            ),
-          ),
-        ),
-        textTheme: const TextTheme(
-          headlineSmall: TextStyle(
-            fontWeight: FontWeight.w700,
-            color: navy,
-            letterSpacing: 0.3,
-          ),
-          bodyMedium: TextStyle(
-            color: Color(0xFF5A5A5A),
-          ),
-        ),
+        fontFamily: 'Georgia',
       ),
-      home: const FirstScreen(),
+      home: const LoginScreen(),
     );
   }
 }
 
-/// Transisi halaman custom: fade + slide, terasa lebih halus daripada
-/// perpindahan default Navigator.push.
+/// Transisi halus fade + slide antar layar
 Route<T> elegantRoute<T>(Widget page) {
   return PageRouteBuilder<T>(
     transitionDuration: const Duration(milliseconds: 450),
@@ -79,10 +41,9 @@ Route<T> elegantRoute<T>(Widget page) {
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       final fade = CurvedAnimation(parent: animation, curve: Curves.easeOut);
       final slide = Tween<Offset>(
-        begin: const Offset(0.06, 0),
+        begin: const Offset(0, 0.05),
         end: Offset.zero,
       ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic));
-
       return FadeTransition(
         opacity: fade,
         child: SlideTransition(position: slide, child: child),
@@ -91,65 +52,208 @@ Route<T> elegantRoute<T>(Widget page) {
   );
 }
 
-class FirstScreen extends StatelessWidget {
-  const FirstScreen({Key? key}) : super(key: key);
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({Key? key}) : super(key: key);
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _usernameController = TextEditingController();
+  final _bookingCodeController = TextEditingController();
+
+  static const darkBrown = Color(0xFF3E2723);
+  static const softBrown = Color(0xFF8D6E63);
+  static const babyPink = Color(0xFFF6C6C9);
+  static const babyPinkDeep = Color(0xFFF0AEB4);
+  static const cream = Color(0xFFFBF3EE);
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _bookingCodeController.dispose();
+    super.dispose();
+  }
+
+  InputDecoration _fieldDecoration({
+    required String label,
+    required IconData icon,
+  }) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: const TextStyle(color: softBrown, fontSize: 14),
+      prefixIcon: Icon(icon, color: darkBrown, size: 20),
+      filled: true,
+      fillColor: Colors.white,
+      contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: babyPinkDeep, width: 1.2),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: darkBrown, width: 1.6),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Color(0xFFB3261E), width: 1.2),
+      ),
+    );
+  }
+
+  void _handleLogin() {
+    if (_formKey.currentState!.validate()) {
+      // Navigasi ke Home Page (halaman unduh foto)
+      Navigator.push(context, elegantRoute(const HomePage()));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Scaffold(
-      appBar: AppBar(title: const Text('FIRST SCREEN')),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 88,
-                height: 88,
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primary,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: theme.colorScheme.primary.withOpacity(0.25),
-                      blurRadius: 24,
-                      offset: const Offset(0, 10),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [darkBrown, softBrown],
+          ),
+        ),
+        child: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 84,
+                    height: 84,
+                    decoration: BoxDecoration(
+                      color: babyPink,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.25),
+                          blurRadius: 20,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                child: Icon(
-                  Icons.home_filled,
-                  color: theme.colorScheme.secondary,
-                  size: 40,
-                ),
+                    child: const Icon(
+                      Icons.camera_alt_rounded,
+                      color: darkBrown,
+                      size: 36,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Photobooth',
+                    style: TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                      color: babyPink,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Masukkan data booking kamu\nuntuk mengambil hasil foto',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: babyPink.withOpacity(0.85),
+                      height: 1.5,
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: cream,
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 24,
+                          offset: const Offset(0, 12),
+                        ),
+                      ],
+                    ),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          TextFormField(
+                            controller: _usernameController,
+                            style: const TextStyle(color: darkBrown),
+                            decoration: _fieldDecoration(
+                              label: 'Username',
+                              icon: Icons.person_outline_rounded,
+                            ),
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Username tidak boleh kosong';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                          TextFormField(
+                            controller: _bookingCodeController,
+                            style: const TextStyle(color: darkBrown),
+                            textCapitalization: TextCapitalization.characters,
+                            decoration: _fieldDecoration(
+                              label: 'Kode booking',
+                              icon: Icons.confirmation_number_outlined,
+                            ),
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Kode booking tidak boleh kosong';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 24),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: darkBrown,
+                                foregroundColor: babyPink,
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                elevation: 3,
+                                textStyle: const TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 1.2,
+                                ),
+                              ),
+                              onPressed: _handleLogin,
+                              child: const Text('MASUK'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    'Simpan kenangan momen fotomu ✦',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: babyPink.withOpacity(0.75),
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 28),
-              Text(
-                'Selamat Datang',
-                style: theme.textTheme.headlineSmall,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 10),
-              Text(
-                'Tekan tombol di bawah untuk berpindah\nke halaman kedua.',
-                style: theme.textTheme.bodyMedium,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 36),
-              ElevatedButton(
-                onPressed: () {
-                  // Navigasi ke Halaman Kedua dengan transisi custom
-                  Navigator.push(
-                    context,
-                    elegantRoute(const HomePage()),
-                  );
-                },
-                child: const Text('GO TO SECOND SCREEN'),
-              ),
-            ],
+            ),
           ),
         ),
       ),
